@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChatGPT Proxy Tester</title>
+</head>
+<body>
+  <h2>ChatGPT Test via Render Proxy</h2>
+  <input type="text" id="apikey" placeholder="sk-xxxxxxxx" style="width:400px;" />
+  <br><br>
+  <textarea id="message" rows="4" cols="60" placeholder="Enter your prompt here..."></textarea>
+  <br><br>
+  <button onclick="send()">Send</button>
+
+  <pre id="result" style="white-space:pre-wrap; margin-top:20px;"></pre>
+
+  <script>
+    async function send() {
+      const apikey = document.getElementById("apikey").value.trim();
+      const msg = document.getElementById("message").value.trim();
+      const result = document.getElementById("result");
+      result.textContent = "Waiting...";
+
+      const body = {
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: msg }]
+      };
+
+      try {
+        const res = await fetch(`/proxy?url=https://api.openai.com/v1/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + apikey
+          },
+          body: JSON.stringify(body)
+        });
+
+        const data = await res.json();
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        result.textContent = "Error: " + err;
+      }
+    }
+  </script>
+</body>
+</html>
